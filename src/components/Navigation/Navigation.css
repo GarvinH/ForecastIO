@@ -1,0 +1,8 @@
+.nav-link a{
+    color: rgba(255,255,255,0.5) !important;
+}
+.nav-link a:hover,
+.nav-link a.active {
+    text-decoration: none;
+    color: rgba(255,255,255,1) !important;
+}
