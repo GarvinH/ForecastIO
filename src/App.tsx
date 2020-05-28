@@ -8,7 +8,7 @@ interface State {
   readonly weatherMethod: weatherMode;
   readonly searchMethod: searchMode;
   readonly city: string;
-  readonly coord: [number | null, number | null];
+  readonly coord: [string, string];
 }
 
 class App extends React.Component {
@@ -16,7 +16,7 @@ class App extends React.Component {
     weatherMethod: weatherMode.forecast,
     searchMethod: searchMode.city,
     city: "",
-    coord: [null, null],
+    coord: ["", ""],
   }
 
   changeWeather = (value: weatherMode) => {
@@ -27,13 +27,27 @@ class App extends React.Component {
     this.setState({searchMethod: value})
   }
 
+  changeCity = (city: string) => {
+    this.setState({city: city})
+  }
+
+  changeCoord = (index: number, value: string) => {
+    const newCoord = [...this.state.coord]
+    newCoord[index] = value
+    this.setState({coord: newCoord})
+  }
+
   render() {
     return (
       <WeatherContext.Provider value={{
         changeWeatherMode: this.changeWeather,
         changeSearchMode: this.changeSearch,
         weatherMode: this.state.weatherMethod,
-        searchMode: this.state.searchMethod
+        searchMode: this.state.searchMethod,
+        city: this.state.city,
+        coord: this.state.coord,
+        cityChanged: this.changeCity,
+        coordChanged: this.changeCoord
       }}>
         <Layout>
           <Switch>

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
@@ -12,35 +12,40 @@ type PathParams = {
 
 type Props = RouteComponentProps<PathParams>;
 
-const forecastClicked = (history: RouteComponentProps["history"]): void => {
-    history.replace("/forecast")
-}
 
-const currentClicked = (history: RouteComponentProps["history"]): void => {
-    history.replace("/current")
-}
-
-
-const Navigation: React.FC<Props> = (props) => {
-    const context = useContext(WeatherContext)
-    console.log(typeof context)
+class Navigation extends React.Component<Props> {
     
-    return (
-        <Navbar bg="dark" variant="dark" expand="lg">
-            <Navbar.Brand>Forecast.IO</Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="ml-auto">
-                    <Nav.Link onClick={() => {forecastClicked(props.history); context.changeWeatherMode(weatherMode.forecast)}}>
-                        5 Days
+    forecastClicked = (history: RouteComponentProps["history"]): void => {
+        this.context.changeWeatherMode(weatherMode.forecast)
+        history.replace("/forecast")
+    }
+    
+    currentClicked = (history: RouteComponentProps["history"]): void => {
+        this.context.changeWeatherMode(weatherMode.current)
+        history.replace("/current")
+    }
+
+    render() {
+        return (
+            <Navbar bg="dark" variant="dark" expand="lg">
+                <Navbar.Brand>Forecast.IO</Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="ml-auto">
+                        <Nav.Link onClick={() => this.forecastClicked(this.props.history)}>
+                            5 Days
                 </Nav.Link>
-                    <Nav.Link onClick={() => {currentClicked(props.history); context.changeWeatherMode(weatherMode.current)}}>
-                        Current
+                        <Nav.Link onClick={() => this.currentClicked(this.props.history)}>
+                            Current
                 </Nav.Link>
-                </Nav>
-            </Navbar.Collapse>
-        </Navbar>
-    )
+                    </Nav>
+                </Navbar.Collapse>
+            </Navbar>
+        )
+    }
 }
+
+Navigation.contextType = WeatherContext
+
 
 export default withRouter(Navigation)
