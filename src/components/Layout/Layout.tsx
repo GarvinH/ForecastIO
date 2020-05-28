@@ -10,7 +10,7 @@ const Layout: React.FC<Props> = ({children} : Props) => {
     return (
         <React.Fragment>
             <Navigation />
-            <Banner title="5 Day Forecast" city="Toronto"/>
+            <Banner/>
             <main>
                 {children}
             </main>
