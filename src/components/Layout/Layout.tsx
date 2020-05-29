@@ -1,6 +1,6 @@
 import React from 'react'
 import Navigation from '../Navigation/Navigation'
-import Banner from '../Banner/Banner'
+import Banner from '../../containers/Banner/Banner'
 
 interface Props {
     children: React.ReactNode

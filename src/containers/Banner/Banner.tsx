@@ -4,7 +4,16 @@ import './Banner.css'
 import { Jumbotron, Form } from 'react-bootstrap'
 import { weatherMode, searchMode } from '../../enums'
 
+interface State {
+    readonly city: string;
+    readonly coord: [string, string];
+}
+
 class Banner extends React.Component {
+    state: State = {
+        city: "",
+        coord: ["", ""]
+    }
 
     titleDecider = (weatherMethod: weatherMode) => {
         switch (weatherMethod) {
@@ -15,35 +24,51 @@ class Banner extends React.Component {
         }
     }
 
+    cityTextChanged = (city: string) => {
+        this.setState({ city: city })
+    }
+
+    coordTextChanged = (index: number, value: string) => {
+        const newCoord = [...this.state.coord]
+        newCoord[index] = value
+        this.setState({ coord: newCoord })
+    }
+
     formDecider = (searchMethod: searchMode) => {
         switch (searchMethod) {
             case (searchMode.city):
                 return (<Form.Group>
-                    <Form.Control id="city" type="text" placeholder="City Name" 
-                    aria-label="Enter city name" value={this.context.city} 
-                    onChange={(event) => this.context.cityChanged(event.target.value)}/>
+                    <Form.Control id="city" type="text" placeholder="City Name"
+                        aria-label="Enter city name" value={this.state.city}
+                        onChange={(event) => this.cityTextChanged(event.target.value)} />
                 </Form.Group>)
             case (searchMode.coord):
                 return (<Form.Group>
                     <Form.Control type="text" placeholder="Latitude" aria-label="Enter latitude"
-                    value={this.context.coord[0]} 
-                    onChange={(event) => this.context.coordChanged(0, event.target.value)} />
-                    <Form.Control type="text" placeholder="Longitude" aria-label="Enter longitude" 
-                    value={this.context.coord[1]} 
-                    onChange={(event) => this.context.coordChanged(1, event.target.value)}/>
+                        value={this.state.coord[0]}
+                        onChange={(event) => this.coordTextChanged(0, event.target.value)} />
+                    <Form.Control type="text" placeholder="Longitude" aria-label="Enter longitude"
+                        value={this.state.coord[1]}
+                        onChange={(event) => this.coordTextChanged(1, event.target.value)} />
                 </Form.Group>)
         }
     }
 
     searchChanged = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        switch(event.target.value) {
-            case("city"):
+        switch (event.target.value) {
+            case ("city"):
                 this.context.changeSearchMode(searchMode.city)
                 break;
-            case("coord"):
+            case ("coord"):
                 this.context.changeSearchMode(searchMode.coord)
                 break;
         }
+    }
+
+    formSubmit = (event: React.FormEvent) => {
+        event.preventDefault()
+        this.context.cityChanged(this.state.city)
+        this.context.coordChanged(this.state.coord)
     }
 
     render() {
@@ -54,8 +79,8 @@ class Banner extends React.Component {
         return (
             <Jumbotron>
                 <h1 className="display-2">{title}</h1>
-                <h1 className="display-4 text-muted">Toronto</h1>
-                <Form >
+                <h1 className="display-4 text-muted">{this.context.city}</h1>
+                <Form onSubmit={this.formSubmit}>
                     <Form.Group>
                         <Form.Label aria-label="Select search method">Search by:</Form.Label>
                         <Form.Control as="select" onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.searchChanged(event)}>
