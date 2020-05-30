@@ -1,8 +1,9 @@
 import React from 'react'
 import axios from 'axios'
 import { searchMode } from '../../enums'
-import { Container } from 'react-bootstrap'
+import { Container, Row } from 'react-bootstrap'
 import WeatherCard from '../../components/WeatherCard/WeatherCard'
+import { timestampToAdjustedDate } from '../../DateResolver/DateResolver'
 
 interface Props {
     searchMethod: searchMode,
@@ -15,14 +16,16 @@ interface State {
     message: string | null;
     forecast: Array<Array<any>>;
     cityInfo: any;
+    forecastIndex: Array<number>;
 }
 
 class Forecast extends React.Component<Props> {
     state: State = {
         code: null,
         message: null,
-        forecast: new Array<Array<any>>(),
-        cityInfo: {}
+        forecast: new Array<Array<any>>(5),
+        cityInfo: {},
+        forecastIndex: new Array<number>(5)
     }
 
     componentDidUpdate(prevProps: Props) {
@@ -44,7 +47,7 @@ class Forecast extends React.Component<Props> {
             var index: number = -1
             var lastDate: number = 0;
             for (let weatherData of data.list) {
-                const date = parseInt(weatherData.dt_txt.split(" ")[0].split("-")[2])
+                const date = timestampToAdjustedDate(weatherData.dt, cityInfo.timezone).getUTCDate()
                 if (lastDate !== date) {
                     index++;
                     lastDate = date
@@ -55,7 +58,24 @@ class Forecast extends React.Component<Props> {
                 forecast[index].push(weatherData)
             }
 
-            this.setState({code: code, forecast: forecast, cityInfo: cityInfo})
+            const forecastIndex = forecast.map((day, index) => {
+                if (index === 0) {
+                    return 0;
+                }
+
+                var hourlyIndex = 0
+                for (let hourForecast of day) {
+                    const date = timestampToAdjustedDate(hourForecast.dt, cityInfo.timezone)
+                    if (date.getUTCHours() >= 11) {
+                        return hourlyIndex
+                    }
+                    hourlyIndex++;
+                }
+
+                return 0
+            })
+
+            this.setState({ code: code, forecast: forecast, cityInfo: cityInfo, forecastIndex: forecastIndex })
         }).catch(err => {
             console.log(err)
             this.setState({ code: err.cod, message: err.message })
@@ -72,10 +92,23 @@ class Forecast extends React.Component<Props> {
     }
 
     render() {
-        const tempCast = this.state.code === 200 ? this.state.forecast[0][0] : null
-        const card = this.state.code === 200 ? <WeatherCard dateTimestamp={tempCast.dt} weatherInfo={tempCast.weather} timezone={this.state.cityInfo.timezone}/> : null
+        const cards = this.state.forecast.map((day, index) => {
+            const forecast = this.state.code === 200 ? this.state.forecast[index][this.state.forecastIndex[index]]: null
+            const card = this.state.code === 200 ? <WeatherCard dateTimestamp={forecast.dt} weatherInfo={forecast.weather} timezone={this.state.cityInfo.timezone} temp={forecast.main.temp}/> : null
+            return card
+        })
+        // const tempCast = this.state.code === 200 ? this.state.forecast[0][0] : null
+        // const card = this.state.code === 200 ? <WeatherCard dateTimestamp={tempCast.dt} weatherInfo={tempCast.weather} timezone={this.state.cityInfo.timezone} temp={tempCast.main.temp}/> : null
+        // const tempCast2 = this.state.code === 200 ? this.state.forecast[1][0] : null
+        // const card2 = this.state.code === 200 ? <WeatherCard dateTimestamp={tempCast2.dt} weatherInfo={tempCast2.weather} timezone={this.state.cityInfo.timezone} temp={tempCast2.main.temp}/> : null
         return (
-            card
+            <Container>
+                <Row className="justify-content-center">
+                    {cards}
+                    {/* {card}
+                    {card2} */}
+                </Row>
+            </Container>
         )
     }
 }
