@@ -3,6 +3,7 @@ import Layout from './components/Layout/Layout'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { weatherMode, searchMode } from './enums'
 import WeatherContext from './context/WeatherContext'
+import Forecast from './containers/Forecast/Forecast'
 
 interface State {
   readonly weatherMethod: weatherMode;
@@ -20,21 +21,21 @@ class App extends React.Component {
   }
 
   changeWeather = (value: weatherMode) => {
-    this.setState({weatherMethod: value})
+    this.setState({ weatherMethod: value })
   }
 
   changeSearch = (value: searchMode) => {
-    this.setState({searchMethod: value})
+    this.setState({ searchMethod: value })
   }
 
   changeCity = (city: string) => {
-    this.setState({city: city})
+    this.setState({ city: city })
   }
 
   changeCoord = (index: number, value: string) => {
     const newCoord = [...this.state.coord]
     newCoord[index] = value
-    this.setState({coord: newCoord})
+    this.setState({ coord: newCoord })
   }
 
   render() {
@@ -51,7 +52,8 @@ class App extends React.Component {
       }}>
         <Layout>
           <Switch>
-            <Route path="/forecast" render={() => <h1>forecast</h1>} />
+            <Route path="/forecast" render={() => <Forecast city={this.state.city} coord={this.state.coord}
+            searchMethod={this.state.searchMethod}/>} />
             <Route path="/current" render={() => <h1>current</h1>} />
             <Redirect to="/forecast" />
           </Switch>
