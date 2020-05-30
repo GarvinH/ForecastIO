@@ -1,5 +1,5 @@
 import React from 'react'
-import { weatherMode, searchMode} from '../enums'
+import { weatherMode, searchMode, measurementSys} from '../enums'
 
 const WeatherContext = React.createContext({
     changeWeatherMode: (value: weatherMode) => {},
@@ -9,7 +9,9 @@ const WeatherContext = React.createContext({
     city: "",
     coord: ["", ""],
     cityChanged: (city: string) => {},
-    coordChanged: (index: number, value:string) => {}
+    coordChanged: (index: number, value:string) => {},
+    measureSys: measurementSys.Celcius,
+    measureSysChanged: (value: number) => {}
 })
 
 export default WeatherContext

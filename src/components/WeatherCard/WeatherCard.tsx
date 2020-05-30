@@ -6,7 +6,7 @@ interface Props {
     dateTimestamp: number,
     weatherInfo: any,
     timezone: number,
-    temp: number
+    temp: string
 }
 
 const WeatherCard: React.FC<Props> = ({ dateTimestamp, weatherInfo, timezone, temp }: Props) => {

@@ -4,11 +4,13 @@ import { searchMode } from '../../enums'
 import { Container, Row } from 'react-bootstrap'
 import WeatherCard from '../../components/WeatherCard/WeatherCard'
 import { timestampToAdjustedDate } from '../../DateResolver/DateResolver'
+import { measurementSys } from '../../enums'
 
 interface Props {
     searchMethod: searchMode,
     city: string,
-    coord: [string, string]
+    coord: [string, string],
+    measureSys: measurementSys
 }
 
 interface State {
@@ -32,7 +34,7 @@ class Forecast extends React.Component<Props> {
         if (this.props.city !== prevProps.city || this.props.coord !== prevProps.coord) {
             this.getForecast()
         }
-        console.log(this.state)
+        //console.log(this.state)
     }
 
     getForecast = () => {
@@ -91,10 +93,23 @@ class Forecast extends React.Component<Props> {
         }
     }
 
+    getTemperature = (temp: number): string => {
+        switch (Number(this.props.measureSys)) {
+            case (measurementSys.Kelvin):
+                return temp.toFixed(1)+" K"
+            case (measurementSys.Celcius):
+                return (temp - 273.15).toFixed(1) + " °C"
+            case (measurementSys.Fahrenheit):
+                return ((temp - 273.15) *9/5+32).toFixed(1) + " °F"
+        }
+        return "This should not happen"
+    }
+
     render() {
         const cards = this.state.forecast.map((day, index) => {
             const forecast = this.state.code === 200 ? this.state.forecast[index][this.state.forecastIndex[index]]: null
-            const card = this.state.code === 200 ? <WeatherCard dateTimestamp={forecast.dt} weatherInfo={forecast.weather} timezone={this.state.cityInfo.timezone} temp={forecast.main.temp}/> : null
+            const temperature = this.getTemperature(forecast.main.temp)
+            const card = this.state.code === 200 ? <WeatherCard key={index} dateTimestamp={forecast.dt} weatherInfo={forecast.weather} timezone={this.state.cityInfo.timezone} temp={temperature}/> : null
             return card
         })
         // const tempCast = this.state.code === 200 ? this.state.forecast[0][0] : null
