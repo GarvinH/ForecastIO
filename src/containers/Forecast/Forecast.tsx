@@ -106,16 +106,28 @@ class Forecast extends React.Component<Props> {
         return "This should not happen"
     }
 
+    cardCycleUp = (index: number): void => {    
+        const newForecastIndex: Array<number> = [...this.state.forecastIndex]
+        newForecastIndex[index] = newForecastIndex[index]+1;
+        this.setState({forecastIndex: newForecastIndex})
+    }
+
+    cardCycleDown = (index: number): void => {
+        const newForecastIndex: Array<number> = [...this.state.forecastIndex]
+        newForecastIndex[index] = newForecastIndex[index]-1;
+        this.setState({forecastIndex: newForecastIndex})
+    }
+
     render() {
         const cards = this.state.forecast.map((day, index) => {
             const forecast = this.state.code === 200 ? this.state.forecast[index][this.state.forecastIndex[index]] : null
             const temperature = this.getTemperature(forecast.main.temp)
-            const card = this.state.code === 200 ? <WeatherCard key={index} dateTimestamp={forecast.dt} weatherInfo={forecast.weather} timezone={this.state.cityInfo.timezone} temp={temperature} /> : null
+            const card = this.state.code === 200 ? <WeatherCard dateTimestamp={forecast.dt} weatherInfo={forecast.weather} timezone={this.state.cityInfo.timezone} temp={temperature} /> : null
             return (
-                    <Col>
-                        <ArrowButton direction={Direction.up}/>
+                    <Col key={index}>
+                        <ArrowButton direction={Direction.up} clicked={() => this.cardCycleUp(index)} show={this.state.forecastIndex[index] < this.state.forecast[index].length-1}/>
                         {card}
-                        <ArrowButton direction={Direction.down}/>
+                        <ArrowButton direction={Direction.down} clicked={() => this.cardCycleDown(index)} show={this.state.forecastIndex[index] > 0}/>
                     </Col>
             )
         })
