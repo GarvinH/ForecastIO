@@ -1,0 +1,19 @@
+.arrow {
+    height: 2rem;
+    width: 2rem;
+}
+
+.button {background: none;
+     border: none;
+     display: block;
+     margin: auto;
+}
+
+.up {
+    margin-bottom: 1rem;
+}
+
+.down {
+    margin: 1rem auto;
+    transform: scaleY(-1);
+}
