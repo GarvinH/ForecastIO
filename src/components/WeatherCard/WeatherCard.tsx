@@ -13,7 +13,7 @@ const WeatherCard: React.FC<Props> = ({ dateTimestamp, weatherInfo, timezone, te
     const localDate = timestampToAdjustedDate(dateTimestamp, timezone)
 
     return (
-        <Container className="col-6 col-sm-4 col-md-3 col-lg-2">
+        <Container>
             <Card style={{ textAlign: "center" }}>
                 <Card.Body>
                     <Card.Title>{getDayString(localDate.getUTCDay())}</Card.Title>

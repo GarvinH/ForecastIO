@@ -1,10 +1,11 @@
 import React from 'react'
 import axios from 'axios'
 import { searchMode } from '../../enums'
-import { Container, Row } from 'react-bootstrap'
+import { Container, Row, Col } from 'react-bootstrap'
 import WeatherCard from '../../components/WeatherCard/WeatherCard'
 import { timestampToAdjustedDate } from '../../DateResolver/DateResolver'
 import { measurementSys } from '../../enums'
+import ArrowButton, { Direction } from '../../components/UI/ArrowButton/ArrowButton'
 
 interface Props {
     searchMethod: searchMode,
@@ -96,21 +97,39 @@ class Forecast extends React.Component<Props> {
     getTemperature = (temp: number): string => {
         switch (Number(this.props.measureSys)) {
             case (measurementSys.Kelvin):
-                return temp.toFixed(1)+" K"
+                return temp.toFixed(1) + " K"
             case (measurementSys.Celcius):
                 return (temp - 273.15).toFixed(1) + " °C"
             case (measurementSys.Fahrenheit):
-                return ((temp - 273.15) *9/5+32).toFixed(1) + " °F"
+                return ((temp - 273.15) * 9 / 5 + 32).toFixed(1) + " °F"
         }
         return "This should not happen"
     }
 
+    cardCycleUp = (index: number): void => {    
+        const newForecastIndex: Array<number> = [...this.state.forecastIndex]
+        newForecastIndex[index] = newForecastIndex[index]+1;
+        this.setState({forecastIndex: newForecastIndex})
+    }
+
+    cardCycleDown = (index: number): void => {
+        const newForecastIndex: Array<number> = [...this.state.forecastIndex]
+        newForecastIndex[index] = newForecastIndex[index]-1;
+        this.setState({forecastIndex: newForecastIndex})
+    }
+
     render() {
         const cards = this.state.forecast.map((day, index) => {
-            const forecast = this.state.code === 200 ? this.state.forecast[index][this.state.forecastIndex[index]]: null
+            const forecast = this.state.code === 200 ? this.state.forecast[index][this.state.forecastIndex[index]] : null
             const temperature = this.getTemperature(forecast.main.temp)
-            const card = this.state.code === 200 ? <WeatherCard key={index} dateTimestamp={forecast.dt} weatherInfo={forecast.weather} timezone={this.state.cityInfo.timezone} temp={temperature}/> : null
-            return card
+            const card = this.state.code === 200 ? <WeatherCard dateTimestamp={forecast.dt} weatherInfo={forecast.weather} timezone={this.state.cityInfo.timezone} temp={temperature} /> : null
+            return (
+                    <Col key={index}>
+                        <ArrowButton direction={Direction.up} clicked={() => this.cardCycleUp(index)} show={this.state.forecastIndex[index] < this.state.forecast[index].length-1}/>
+                        {card}
+                        <ArrowButton direction={Direction.down} clicked={() => this.cardCycleDown(index)} show={this.state.forecastIndex[index] > 0}/>
+                    </Col>
+            )
         })
         // const tempCast = this.state.code === 200 ? this.state.forecast[0][0] : null
         // const card = this.state.code === 200 ? <WeatherCard dateTimestamp={tempCast.dt} weatherInfo={tempCast.weather} timezone={this.state.cityInfo.timezone} temp={tempCast.main.temp}/> : null
