@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from './components/Layout/Layout'
 import { Switch, Route, Redirect } from 'react-router-dom'
-import { weatherMode, searchMode } from './enums'
+import { weatherMode, searchMode, measurementSys } from './enums'
 import WeatherContext from './context/WeatherContext'
 import Forecast from './containers/Forecast/Forecast'
 
@@ -10,6 +10,7 @@ interface State {
   readonly searchMethod: searchMode;
   readonly city: string;
   readonly coord: [string, string];
+  readonly measureSys: measurementSys
 }
 
 class App extends React.Component {
@@ -18,6 +19,7 @@ class App extends React.Component {
     searchMethod: searchMode.city,
     city: "",
     coord: ["", ""],
+    measureSys: measurementSys.Celcius
   }
 
   changeWeather = (value: weatherMode) => {
@@ -38,6 +40,10 @@ class App extends React.Component {
     this.setState({ coord: newCoord })
   }
 
+  measureSysChange = (value: measurementSys) => {
+    this.setState({measureSys: value})
+  }
+
   render() {
     return (
       <WeatherContext.Provider value={{
@@ -48,12 +54,14 @@ class App extends React.Component {
         city: this.state.city,
         coord: this.state.coord,
         cityChanged: this.changeCity,
-        coordChanged: this.changeCoord
+        coordChanged: this.changeCoord,
+        measureSys: this.state.measureSys,
+        measureSysChanged: this.measureSysChange
       }}>
         <Layout>
           <Switch>
             <Route path="/forecast" render={() => <Forecast city={this.state.city} coord={this.state.coord}
-            searchMethod={this.state.searchMethod}/>} />
+            searchMethod={this.state.searchMethod} measureSys={this.state.measureSys}/>} />
             <Route path="/current" render={() => <h1>current</h1>} />
             <Redirect to="/forecast" />
           </Switch>

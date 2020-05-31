@@ -1,8 +1,8 @@
 import React from 'react'
 import WeatherContext from '../../context/WeatherContext'
 import './Banner.css'
-import { Jumbotron, Form } from 'react-bootstrap'
-import { weatherMode, searchMode } from '../../enums'
+import { Jumbotron, Form, Button } from 'react-bootstrap'
+import { weatherMode, searchMode, measurementSys } from '../../enums'
 
 interface State {
     readonly city: string;
@@ -79,7 +79,7 @@ class Banner extends React.Component {
         return (
             <Jumbotron>
                 <h1 className="display-2">{title}</h1>
-                <h1 className="display-4 text-muted">{this.context.city}</h1>
+                <h1 className="display-4 text-muted" style={{textTransform: "capitalize"}}>{this.context.city}</h1>
                 <Form onSubmit={this.formSubmit}>
                     <Form.Group>
                         <Form.Label aria-label="Select search method">Search by:</Form.Label>
@@ -89,7 +89,12 @@ class Banner extends React.Component {
                         </Form.Control>
                     </Form.Group>
                     {form}
-
+                    <Button type="submit" onSubmit={this.formSubmit} className="mb-4">Submit</Button>
+                    <Form.Group controlId="formBasicRangeCustom">
+                        <Form.Label>Measurement System</Form.Label>
+                        <Form.Control type="range" custom min="0" value={this.context.measureSys} max="2" onChange={(event) => this.context.measureSysChanged(event.target.value)} />
+                    </Form.Group>
+                    <h3>{measurementSys[this.context.measureSys]}</h3>
                 </Form>
             </Jumbotron>
         )
