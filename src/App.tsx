@@ -34,9 +34,8 @@ class App extends React.Component {
     this.setState({ city: city })
   }
 
-  changeCoord = (index: number, value: string) => {
-    const newCoord = [...this.state.coord]
-    newCoord[index] = value
+  changeCoord = (coord: Array<string>) => {
+    const newCoord = [...coord]
     this.setState({ coord: newCoord })
   }
 
@@ -61,7 +60,7 @@ class App extends React.Component {
         <Layout>
           <Switch>
             <Route path="/forecast" render={() => <Forecast city={this.state.city} coord={this.state.coord}
-            searchMethod={this.state.searchMethod} measureSys={this.state.measureSys}/>} />
+            searchMethod={this.state.searchMethod} measureSys={this.state.measureSys} changedCity={this.changeCity}/>} />
             <Route path="/current" render={() => <h1>current</h1>} />
             <Redirect to="/forecast" />
           </Switch>

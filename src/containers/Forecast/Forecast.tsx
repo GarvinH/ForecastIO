@@ -11,7 +11,8 @@ interface Props {
     searchMethod: searchMode,
     city: string,
     coord: [string, string],
-    measureSys: measurementSys
+    measureSys: measurementSys,
+    changedCity: (city: string) => void,
 }
 
 interface State {
@@ -32,7 +33,7 @@ class Forecast extends React.Component<Props> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        if (this.props.city !== prevProps.city || this.props.coord !== prevProps.coord) {
+        if ((this.props.city !== prevProps.city && this.props.searchMethod === searchMode.city) || (this.props.coord !== prevProps.coord && this.props.searchMethod === searchMode.coord)) {
             this.getForecast()
         }
         //console.log(this.state)
@@ -49,7 +50,7 @@ class Forecast extends React.Component<Props> {
 
             var index: number = -1
             var lastDate: number = 0;
-            for (let weatherData of data.list) {
+            for (let weatherData of data.list) {//collect all data for corresponding days of the week
                 const date = timestampToAdjustedDate(weatherData.dt, cityInfo.timezone).getUTCDate()
                 if (lastDate !== date) {
                     index++;
@@ -61,7 +62,7 @@ class Forecast extends React.Component<Props> {
                 forecast[index].push(weatherData)
             }
 
-            const forecastIndex = forecast.map((day, index) => {
+            const forecastIndex = forecast.map((day, index) => {//find appropriate time to display for default: 11am-2pm are default and varies according to timezone
                 if (index === 0) {
                     return 0;
                 }
@@ -78,6 +79,7 @@ class Forecast extends React.Component<Props> {
                 return 0
             })
 
+            this.props.changedCity(data.city.name)
             this.setState({ code: code, forecast: forecast, cityInfo: cityInfo, forecastIndex: forecastIndex })
         }).catch(err => {
             console.log(err)

@@ -64,7 +64,9 @@ export const getMonthString = (month: number): string => {
 }
 
 export const getHourString = (hour: number): string => {
-    if (hour < 12) {
+    if (hour === 0) {
+        return "12:00 am"
+    } else if (hour < 12) {
         return hour+":00 am"
     } else if (hour === 12) {
         return "12:00 pm"
