@@ -32,10 +32,10 @@ class Navigation extends React.Component<Props> {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="ml-auto">
-                        <Nav.Link onClick={() => this.forecastClicked(this.props.history)}>
+                        <Nav.Link className={this.props.location.pathname === "/forecast" ? "active" : ""} onClick={() => this.forecastClicked(this.props.history)}>
                             5 Days
                 </Nav.Link>
-                        <Nav.Link onClick={() => this.currentClicked(this.props.history)}>
+                        <Nav.Link className={this.props.location.pathname === "/current" ? "active" : ""} onClick={() => this.currentClicked(this.props.history)}>
                             Current
                 </Nav.Link>
                     </Nav>

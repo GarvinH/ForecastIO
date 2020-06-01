@@ -10,7 +10,8 @@ interface State {
   readonly searchMethod: searchMode;
   readonly city: string;
   readonly coord: [string, string];
-  readonly measureSys: measurementSys
+  readonly measureSys: measurementSys;
+  readonly loading: boolean;
 }
 
 class App extends React.Component {
@@ -19,7 +20,8 @@ class App extends React.Component {
     searchMethod: searchMode.city,
     city: "",
     coord: ["", ""],
-    measureSys: measurementSys.Celcius
+    measureSys: measurementSys.Metric,
+    loading: false,
   }
 
   changeWeather = (value: weatherMode) => {
@@ -43,6 +45,10 @@ class App extends React.Component {
     this.setState({measureSys: value})
   }
 
+  updateLoading = (newLoading: boolean) => {
+    this.setState({loading: newLoading})
+  }
+
   render() {
     return (
       <WeatherContext.Provider value={{
@@ -60,7 +66,8 @@ class App extends React.Component {
         <Layout>
           <Switch>
             <Route path="/forecast" render={() => <Forecast city={this.state.city} coord={this.state.coord}
-            searchMethod={this.state.searchMethod} measureSys={this.state.measureSys} changedCity={this.changeCity}/>} />
+            searchMethod={this.state.searchMethod} measureSys={this.state.measureSys} changedCity={this.changeCity}
+            loading={this.state.loading} updateLoading={this.updateLoading} />} />
             <Route path="/current" render={() => <h1>current</h1>} />
             <Redirect to="/forecast" />
           </Switch>

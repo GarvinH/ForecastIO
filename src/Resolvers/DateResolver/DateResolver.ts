@@ -1,3 +1,4 @@
+//takes unix time stamp
 export const timestampToAdjustedDate =(timestamp: number, timezone: number): Date => (
     new Date(timestamp * 1000 + timezone * 1000)
 )

@@ -15,6 +15,6 @@ export enum actionTypes {
 
 export enum measurementSys {
     Kelvin,
-    Celcius,
-    Fahrenheit
+    Metric,
+    Imperial
 }
