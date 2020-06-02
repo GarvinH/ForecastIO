@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from './components/Layout/Layout'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Switch, Route, Redirect, withRouter, RouteComponentProps } from 'react-router-dom'
 import { weatherMode, searchMode, measurementSys } from './enums'
 import WeatherContext from './context/WeatherContext'
 import Forecast, { ForecastState } from './containers/Forecast/Forecast'
@@ -16,7 +16,13 @@ interface State {
   readonly forecastData: ForecastState | null;
 }
 
-class App extends React.Component {
+interface PathParams {
+  path: string
+}
+
+type Props = RouteComponentProps<PathParams>
+
+class App extends React.Component<Props> {
   state: State = {
     weatherMethod: weatherMode.forecast,
     searchMethod: searchMode.city,
@@ -25,6 +31,18 @@ class App extends React.Component {
     measureSys: measurementSys.Metric,
     loading: false,
     forecastData: null
+  }
+
+  componentDidMount() {
+    const location = this.props.location.pathname
+    switch (location) {
+      case ("/forecast"):
+        this.changeWeather(weatherMode.forecast)
+        break;
+      case ("/current"):
+        this.changeWeather(weatherMode.current)
+        break;  
+    }
   }
 
   changeWeather = (value: weatherMode) => {
@@ -84,4 +102,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default withRouter(App);

@@ -24,7 +24,7 @@ class Current extends React.Component<Props> {
     getCurrent = () => {
         const url = "https://forecast-io-server.herokuapp.com/current" + getSearchPath(this.props.searchMethod, this.props.city, this.props.coord)
         axios.get(url).then(res => {
-            console.log(res)
+            console.log(res.data)
         }).catch(err => {
             console.log(err)
             this.setState({ code: err.cod, message: err.message })
