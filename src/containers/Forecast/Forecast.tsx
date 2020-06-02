@@ -1,33 +1,35 @@
 import React from 'react'
-import axios from 'axios'
+import axios from '../../axios'
 import { searchMode } from '../../enums'
-import { Container, Row, Col, Spinner } from 'react-bootstrap'
+import { Container, Row, Col } from 'react-bootstrap'
 import WeatherCard from '../../components/WeatherCard/WeatherCard'
 import { timestampToAdjustedDate } from '../../Resolvers/DateResolver/DateResolver'
 import { measurementSys } from '../../enums'
 import ArrowButton, { Direction } from '../../components/UI/ArrowButton/ArrowButton'
-import DetailedForecast from '../../components/DetailedForecast/DetailedForecast'
+import DetailedForecast from '../../components/DetailedWeather/DetailedWeather'
 import { getTemperature } from '../../Resolvers/UnitResolver/UnitResolver'
+import { getSearchPath, shouldUpdateSearch } from '../../Resolvers/SearchResolver/SearchResolver'
+import { contentDeterminer } from '../../Resolvers/ContentResolver/ContentResolver'
 
 interface Props {
-    oldData: ForecastState | null,
-    saveData: (state: ForecastState) => void,
-    searchMethod: searchMode,
-    city: string,
-    coord: [string, string],
-    measureSys: measurementSys,
-    changedCity: (city: string) => void,
-    loading: boolean,
-    updateLoading: (value: boolean) => void
+    readonly oldData: ForecastState | null,
+    readonly saveData: (state: ForecastState) => void,
+    readonly searchMethod: searchMode,
+    readonly city: string,
+    readonly coord: [string, string],
+    readonly measureSys: measurementSys,
+    readonly changedCity: (city: string) => void,
+    readonly loading: boolean,
+    readonly updateLoading: (value: boolean) => void
 }
 
 export interface ForecastState {
-    code: number | null;
-    message: string | null;
-    forecast: Array<Array<any>>;//openweathermap api docs are really lacking -> unpredicatble inputs -> can't type
-    cityInfo: any;
-    forecastIndex: Array<number>;
-    selectedForecast: [number, number];
+    readonly code: number | null;
+    readonly message: string | null;
+    readonly forecast: Array<Array<any>>;//openweathermap api docs are really lacking -> unpredicatble inputs -> can't type
+    readonly cityInfo: any;
+    readonly forecastIndex: Array<number>;
+    readonly selectedForecast: [number, number];
 }
 
 class Forecast extends React.Component<Props> {
@@ -47,11 +49,10 @@ class Forecast extends React.Component<Props> {
         } else if (this.props.city !== "" || (this.props.coord[0] !== "" && this.props.coord[1] !== "")) {
             this.getForecast()
         }
-
     }
 
     componentDidUpdate(prevProps: Props) {
-        if ((this.props.city !== prevProps.city && this.props.searchMethod === searchMode.city) || (this.props.coord !== prevProps.coord && this.props.searchMethod === searchMode.coord)) {
+        if (shouldUpdateSearch(this.props.city, this.props.coord, prevProps.city, prevProps.coord, this.props.searchMethod)) {
             this.getForecast()
         }
     }
@@ -62,8 +63,9 @@ class Forecast extends React.Component<Props> {
 
     getForecast = () => {
         this.props.updateLoading(true)
-        const url = "https://forecast-io-server.herokuapp.com/forecast" + this.getSearchPath()
+        const url = "/forecast" + getSearchPath(this.props.searchMethod, this.props.city, this.props.coord)
         axios.get(url).then(res => {
+
             const data = res.data
 
             const code = parseInt(data.cod)
@@ -105,20 +107,13 @@ class Forecast extends React.Component<Props> {
             this.setState({ code: code, forecast: forecast, cityInfo: cityInfo, forecastIndex: forecastIndex })
             this.props.updateLoading(false)
         }).catch(err => {
-            console.log(err)
-            this.setState({ code: err.cod, message: err.message })
+            const response = err.response
+            this.setState({ code: response.status, message: response.data.message })
             this.props.updateLoading(false)
         })
     }
 
-    getSearchPath = () => {
-        switch (this.props.searchMethod) {
-            case (searchMode.city):
-                return "/city?city=" + this.props.city
-            case (searchMode.coord):
-                return "/coord?lat=" + this.props.coord[0] + "&lon=" + this.props.coord[1]
-        }
-    }
+
 
     //index for the following methods refers to the index of the corresponding days
     cardCycleUp = (index: number): void => {
@@ -152,24 +147,18 @@ class Forecast extends React.Component<Props> {
             )
         })
         const detailedInfo = this.state.code === 200 ? this.state.forecast[this.state.selectedForecast[0]][this.state.selectedForecast[1]] : null
-        const detailedForecast = this.state.code === 200 ? <DetailedForecast forecast={detailedInfo} timezone={this.state.cityInfo.timezone} measureSys={this.props.measureSys} /> : null
-        // const tempCast2 = this.state.code === 200 ? this.state.forecast[1][0] : null
-        // const card2 = this.state.code === 200 ? <WeatherCard dateTimestamp={tempCast2.dt} weatherInfo={tempCast2.weather} timezone={this.state.cityInfo.timezone} temp={tempCast2.main.temp}/> : null
-        return (this.props.loading ?
+        const detailedForecast = this.state.code === 200 ? <DetailedForecast weather={detailedInfo} timezone={this.state.cityInfo.timezone} measureSys={this.props.measureSys} /> : null
 
-            (<Container className="text-center">
-                <Spinner animation="border" role="status">
-                    <span className="sr-only">Loading...</span>
-                </Spinner>
-            </Container>) :
+        const weatherInfo = <Container>
+            <Row className="justify-content-center">
+                {cards}
+                {detailedForecast}
+            </Row>
+        </Container>
 
-            (<Container>
-                <Row className="justify-content-center">
-                    {cards}
-                    {detailedForecast}
-                </Row>
-            </Container>)
-        )
+        const content = contentDeterminer(weatherInfo, this.props.loading, this.state.code, this.state.message)
+
+        return content
     }
 }
 

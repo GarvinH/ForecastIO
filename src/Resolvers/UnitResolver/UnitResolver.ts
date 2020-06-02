@@ -32,6 +32,17 @@ export const getSpeed = (speed: number, measureSys: measurementSys): string => {
     }
 }
 
+//takes m
+export const getDistance = (meters: number, measureSys: measurementSys): string => {
+    const km = meters / 1000
+    switch (Number(measureSys)) {
+        case (measurementSys.Imperial):
+            return (km/1.60934).toFixed(1) + " mi. "
+        default:
+            return km.toFixed(1) + " km "
+    }
+}
+
 //takes mm
 export const getVolume = (volume: number, measureSys: measurementSys): string => {
     switch (Number(measureSys)) {
