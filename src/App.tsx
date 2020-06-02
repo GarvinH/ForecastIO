@@ -3,7 +3,7 @@ import Layout from './components/Layout/Layout'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { weatherMode, searchMode, measurementSys } from './enums'
 import WeatherContext from './context/WeatherContext'
-import Forecast from './containers/Forecast/Forecast'
+import Forecast, { ForecastState } from './containers/Forecast/Forecast'
 
 interface State {
   readonly weatherMethod: weatherMode;
@@ -12,6 +12,7 @@ interface State {
   readonly coord: [string, string];
   readonly measureSys: measurementSys;
   readonly loading: boolean;
+  readonly forecastData: ForecastState | null;
 }
 
 class App extends React.Component {
@@ -22,6 +23,7 @@ class App extends React.Component {
     coord: ["", ""],
     measureSys: measurementSys.Metric,
     loading: false,
+    forecastData: null
   }
 
   changeWeather = (value: weatherMode) => {
@@ -49,6 +51,10 @@ class App extends React.Component {
     this.setState({loading: newLoading})
   }
 
+  saveForecastData = (state: ForecastState) => {
+    this.setState({forecastData: state})
+  }
+
   render() {
     return (
       <WeatherContext.Provider value={{
@@ -67,7 +73,7 @@ class App extends React.Component {
           <Switch>
             <Route path="/forecast" render={() => <Forecast city={this.state.city} coord={this.state.coord}
             searchMethod={this.state.searchMethod} measureSys={this.state.measureSys} changedCity={this.changeCity}
-            loading={this.state.loading} updateLoading={this.updateLoading} />} />
+            loading={this.state.loading} updateLoading={this.updateLoading} oldData={this.state.forecastData} saveData={this.saveForecastData}/>} />
             <Route path="/current" render={() => <h1>current</h1>} />
             <Redirect to="/forecast" />
           </Switch>

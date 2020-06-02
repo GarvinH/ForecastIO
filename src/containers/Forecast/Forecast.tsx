@@ -10,6 +10,8 @@ import DetailedForecast from '../../components/DetailedForecast/DetailedForecast
 import { getTemperature } from '../../Resolvers/UnitResolver/UnitResolver'
 
 interface Props {
+    oldData: ForecastState | null,
+    saveData: (state: ForecastState) => void,
     searchMethod: searchMode,
     city: string,
     coord: [string, string],
@@ -19,7 +21,7 @@ interface Props {
     updateLoading: (value: boolean) => void
 }
 
-interface State {
+export interface ForecastState {
     code: number | null;
     message: string | null;
     forecast: Array<Array<any>>;//openweathermap api docs are really lacking -> unpredicatble inputs -> can't type
@@ -29,7 +31,7 @@ interface State {
 }
 
 class Forecast extends React.Component<Props> {
-    state: State = {
+    state: ForecastState = {
         code: null,
         message: null,
         forecast: new Array<Array<any>>(5),
@@ -38,11 +40,24 @@ class Forecast extends React.Component<Props> {
         selectedForecast: [0, 0],
     }
 
+    componentDidMount() {
+        if (this.props.oldData !== null && this.props.oldData.cityInfo.name === this.props.city) {
+            this.setState(this.props.oldData)
+            this.props.changedCity(this.props.oldData.cityInfo.name)
+        } else if (this.props.city !== "" || (this.props.coord[0] !== "" && this.props.coord[1] !== "")) {
+            this.getForecast()
+        }
+
+    }
+
     componentDidUpdate(prevProps: Props) {
         if ((this.props.city !== prevProps.city && this.props.searchMethod === searchMode.city) || (this.props.coord !== prevProps.coord && this.props.searchMethod === searchMode.coord)) {
             this.getForecast()
         }
-        //console.log(this.state)
+    }
+
+    componentWillUnmount() {
+        this.props.saveData(this.state)
     }
 
     getForecast = () => {
@@ -86,7 +101,6 @@ class Forecast extends React.Component<Props> {
                 return 0
             })
 
-            console.log(data)
             this.props.changedCity(data.city.name)
             this.setState({ code: code, forecast: forecast, cityInfo: cityInfo, forecastIndex: forecastIndex })
             this.props.updateLoading(false)
@@ -142,7 +156,7 @@ class Forecast extends React.Component<Props> {
         // const tempCast2 = this.state.code === 200 ? this.state.forecast[1][0] : null
         // const card2 = this.state.code === 200 ? <WeatherCard dateTimestamp={tempCast2.dt} weatherInfo={tempCast2.weather} timezone={this.state.cityInfo.timezone} temp={tempCast2.main.temp}/> : null
         return (this.props.loading ?
-            
+
             (<Container className="text-center">
                 <Spinner animation="border" role="status">
                     <span className="sr-only">Loading...</span>
