@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/ForecastIO/static/css/main.0bd68dc6.chunk.css",
+    "main.js": "/ForecastIO/static/js/main.44c0cd6a.chunk.js",
+    "main.js.map": "/ForecastIO/static/js/main.44c0cd6a.chunk.js.map",
+    "runtime-main.js": "/ForecastIO/static/js/runtime-main.987f13b7.js",
+    "runtime-main.js.map": "/ForecastIO/static/js/runtime-main.987f13b7.js.map",
+    "static/js/2.2fd84396.chunk.js": "/ForecastIO/static/js/2.2fd84396.chunk.js",
+    "static/js/2.2fd84396.chunk.js.map": "/ForecastIO/static/js/2.2fd84396.chunk.js.map",
+    "index.html": "/ForecastIO/index.html",
+    "precache-manifest.8f116bfea76e56edcfca81fd04a63c98.js": "/ForecastIO/precache-manifest.8f116bfea76e56edcfca81fd04a63c98.js",
+    "service-worker.js": "/ForecastIO/service-worker.js",
+    "static/css/main.0bd68dc6.chunk.css.map": "/ForecastIO/static/css/main.0bd68dc6.chunk.css.map",
+    "static/js/2.2fd84396.chunk.js.LICENSE.txt": "/ForecastIO/static/js/2.2fd84396.chunk.js.LICENSE.txt",
+    "static/media/Arrow.6b395422.svg": "/ForecastIO/static/media/Arrow.6b395422.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.987f13b7.js",
+    "static/js/2.2fd84396.chunk.js",
+    "static/css/main.0bd68dc6.chunk.css",
+    "static/js/main.44c0cd6a.chunk.js"
+  ]
+}
