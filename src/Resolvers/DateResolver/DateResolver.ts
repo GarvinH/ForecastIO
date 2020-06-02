@@ -64,14 +64,23 @@ export const getMonthString = (month: number): string => {
     }
 }
 
-export const getHourString = (hour: number): string => {
+export const getTimeString = (hour: number, minutes: number): string => {
+    const mins = minutes > 9? minutes : "0" + minutes
+
     if (hour === 0) {
-        return "12:00 am"
+        return "12:"+mins +" am"
     } else if (hour < 12) {
-        return hour+":00 am"
+        return hour+":"+mins +" am"
     } else if (hour === 12) {
-        return "12:00 pm"
+        return "12:" + mins + " pm"
     } else {
-        return (hour-12)+":00 pm"
+        return (hour-12)+":"+mins +" pm"
     }
+}
+
+export const timestampToTimeString = (timestamp: number, timezone: number) => {
+    const date = timestampToAdjustedDate(timestamp, timezone)
+    const hours = date.getUTCHours()
+    const minutes = date.getUTCMinutes()
+    return getTimeString(hours, minutes)
 }

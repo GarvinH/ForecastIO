@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from 'axios'
+import axios from '../../axios'
 import { searchMode } from '../../enums'
 import { Container, Row, Col, Spinner } from 'react-bootstrap'
 import WeatherCard from '../../components/WeatherCard/WeatherCard'
@@ -11,24 +11,24 @@ import { getTemperature } from '../../Resolvers/UnitResolver/UnitResolver'
 import { getSearchPath, shouldUpdateSearch } from '../../Resolvers/SearchResolver/SearchResolver'
 
 interface Props {
-    oldData: ForecastState | null,
-    saveData: (state: ForecastState) => void,
-    searchMethod: searchMode,
-    city: string,
-    coord: [string, string],
-    measureSys: measurementSys,
-    changedCity: (city: string) => void,
-    loading: boolean,
-    updateLoading: (value: boolean) => void
+    readonly oldData: ForecastState | null,
+    readonly saveData: (state: ForecastState) => void,
+    readonly searchMethod: searchMode,
+    readonly city: string,
+    readonly coord: [string, string],
+    readonly measureSys: measurementSys,
+    readonly changedCity: (city: string) => void,
+    readonly loading: boolean,
+    readonly updateLoading: (value: boolean) => void
 }
 
 export interface ForecastState {
-    code: number | null;
-    message: string | null;
-    forecast: Array<Array<any>>;//openweathermap api docs are really lacking -> unpredicatble inputs -> can't type
-    cityInfo: any;
-    forecastIndex: Array<number>;
-    selectedForecast: [number, number];
+    readonly code: number | null;
+    readonly message: string | null;
+    readonly forecast: Array<Array<any>>;//openweathermap api docs are really lacking -> unpredicatble inputs -> can't type
+    readonly cityInfo: any;
+    readonly forecastIndex: Array<number>;
+    readonly selectedForecast: [number, number];
 }
 
 class Forecast extends React.Component<Props> {
@@ -55,6 +55,7 @@ class Forecast extends React.Component<Props> {
         if (shouldUpdateSearch(this.props.city, this.props.coord, prevProps.city, prevProps.coord, this.props.searchMethod)) {
             this.getForecast()
         }
+        console.log(this.state)
     }
 
     componentWillUnmount() {
@@ -63,9 +64,14 @@ class Forecast extends React.Component<Props> {
 
     getForecast = () => {
         this.props.updateLoading(true)
-        const url = "https://forecast-io-server.herokuapp.com/forecast" + getSearchPath(this.props.searchMethod, this.props.city, this.props.coord)
+        const url = "/forecast" + getSearchPath(this.props.searchMethod, this.props.city, this.props.coord)
         axios.get(url).then(res => {
+
             const data = res.data
+
+            if (data.cod !== 200) {
+                throw res.data
+            }
 
             const code = parseInt(data.cod)
             const cityInfo = data.city
@@ -146,7 +152,7 @@ class Forecast extends React.Component<Props> {
             )
         })
         const detailedInfo = this.state.code === 200 ? this.state.forecast[this.state.selectedForecast[0]][this.state.selectedForecast[1]] : null
-        const detailedForecast = this.state.code === 200 ? <DetailedForecast forecast={detailedInfo} timezone={this.state.cityInfo.timezone} measureSys={this.props.measureSys} /> : null
+        const detailedForecast = this.state.code === 200 ? <DetailedForecast weather={detailedInfo} timezone={this.state.cityInfo.timezone} measureSys={this.props.measureSys} /> : null
         // const tempCast2 = this.state.code === 200 ? this.state.forecast[1][0] : null
         // const card2 = this.state.code === 200 ? <WeatherCard dateTimestamp={tempCast2.dt} weatherInfo={tempCast2.weather} timezone={this.state.cityInfo.timezone} temp={tempCast2.main.temp}/> : null
         return (this.props.loading ?

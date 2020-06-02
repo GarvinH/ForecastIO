@@ -93,7 +93,8 @@ class App extends React.Component<Props> {
             <Route path="/forecast" render={() => <Forecast city={this.state.city} coord={this.state.coord}
             searchMethod={this.state.searchMethod} measureSys={this.state.measureSys} changedCity={this.changeCity}
             loading={this.state.loading} updateLoading={this.updateLoading} oldData={this.state.forecastData} saveData={this.saveForecastData}/>} />
-            <Route path="/current" render={() => <Current city={this.state.city} coord={this.state.coord} searchMethod={this.state.searchMethod}/>} />
+            <Route path="/current" render={() => <Current city={this.state.city} coord={this.state.coord} searchMethod={this.state.searchMethod}
+            cityChanged={this.changeCity} measureSys={this.state.measureSys} loading={this.state.loading} updateLoading={this.updateLoading} />} />
             <Redirect to="/forecast" />
           </Switch>
         </Layout>
