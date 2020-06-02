@@ -9,8 +9,8 @@ const WeatherContext = React.createContext({
     city: "",
     coord: ["", ""],
     cityChanged: (city: string) => {},
-    coordChanged: (index: number, value:string) => {},
-    measureSys: measurementSys.Celcius,
+    coordChanged: (coord: Array<string>) => {},
+    measureSys: measurementSys.Metric,
     measureSysChanged: (value: number) => {}
 })
 

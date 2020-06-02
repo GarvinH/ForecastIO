@@ -3,14 +3,16 @@ import Layout from './components/Layout/Layout'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { weatherMode, searchMode, measurementSys } from './enums'
 import WeatherContext from './context/WeatherContext'
-import Forecast from './containers/Forecast/Forecast'
+import Forecast, { ForecastState } from './containers/Forecast/Forecast'
 
 interface State {
   readonly weatherMethod: weatherMode;
   readonly searchMethod: searchMode;
   readonly city: string;
   readonly coord: [string, string];
-  readonly measureSys: measurementSys
+  readonly measureSys: measurementSys;
+  readonly loading: boolean;
+  readonly forecastData: ForecastState | null;
 }
 
 class App extends React.Component {
@@ -19,7 +21,9 @@ class App extends React.Component {
     searchMethod: searchMode.city,
     city: "",
     coord: ["", ""],
-    measureSys: measurementSys.Celcius
+    measureSys: measurementSys.Metric,
+    loading: false,
+    forecastData: null
   }
 
   changeWeather = (value: weatherMode) => {
@@ -34,14 +38,21 @@ class App extends React.Component {
     this.setState({ city: city })
   }
 
-  changeCoord = (index: number, value: string) => {
-    const newCoord = [...this.state.coord]
-    newCoord[index] = value
+  changeCoord = (coord: Array<string>) => {
+    const newCoord = [...coord]
     this.setState({ coord: newCoord })
   }
 
   measureSysChange = (value: measurementSys) => {
     this.setState({measureSys: value})
+  }
+
+  updateLoading = (newLoading: boolean) => {
+    this.setState({loading: newLoading})
+  }
+
+  saveForecastData = (state: ForecastState) => {
+    this.setState({forecastData: state})
   }
 
   render() {
@@ -61,7 +72,8 @@ class App extends React.Component {
         <Layout>
           <Switch>
             <Route path="/forecast" render={() => <Forecast city={this.state.city} coord={this.state.coord}
-            searchMethod={this.state.searchMethod} measureSys={this.state.measureSys}/>} />
+            searchMethod={this.state.searchMethod} measureSys={this.state.measureSys} changedCity={this.changeCity}
+            loading={this.state.loading} updateLoading={this.updateLoading} oldData={this.state.forecastData} saveData={this.saveForecastData}/>} />
             <Route path="/current" render={() => <h1>current</h1>} />
             <Redirect to="/forecast" />
           </Switch>

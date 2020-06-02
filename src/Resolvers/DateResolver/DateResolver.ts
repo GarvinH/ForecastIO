@@ -1,3 +1,4 @@
+//takes unix time stamp
 export const timestampToAdjustedDate =(timestamp: number, timezone: number): Date => (
     new Date(timestamp * 1000 + timezone * 1000)
 )
@@ -64,7 +65,9 @@ export const getMonthString = (month: number): string => {
 }
 
 export const getHourString = (hour: number): string => {
-    if (hour < 12) {
+    if (hour === 0) {
+        return "12:00 am"
+    } else if (hour < 12) {
         return hour+":00 am"
     } else if (hour === 12) {
         return "12:00 pm"

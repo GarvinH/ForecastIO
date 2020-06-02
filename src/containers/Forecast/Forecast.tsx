@@ -1,44 +1,67 @@
 import React from 'react'
 import axios from 'axios'
 import { searchMode } from '../../enums'
-import { Container, Row, Col } from 'react-bootstrap'
+import { Container, Row, Col, Spinner } from 'react-bootstrap'
 import WeatherCard from '../../components/WeatherCard/WeatherCard'
-import { timestampToAdjustedDate } from '../../DateResolver/DateResolver'
+import { timestampToAdjustedDate } from '../../Resolvers/DateResolver/DateResolver'
 import { measurementSys } from '../../enums'
 import ArrowButton, { Direction } from '../../components/UI/ArrowButton/ArrowButton'
+import DetailedForecast from '../../components/DetailedForecast/DetailedForecast'
+import { getTemperature } from '../../Resolvers/UnitResolver/UnitResolver'
 
 interface Props {
+    oldData: ForecastState | null,
+    saveData: (state: ForecastState) => void,
     searchMethod: searchMode,
     city: string,
     coord: [string, string],
-    measureSys: measurementSys
+    measureSys: measurementSys,
+    changedCity: (city: string) => void,
+    loading: boolean,
+    updateLoading: (value: boolean) => void
 }
 
-interface State {
+export interface ForecastState {
     code: number | null;
     message: string | null;
-    forecast: Array<Array<any>>;
+    forecast: Array<Array<any>>;//openweathermap api docs are really lacking -> unpredicatble inputs -> can't type
     cityInfo: any;
     forecastIndex: Array<number>;
+    selectedForecast: [number, number];
 }
 
 class Forecast extends React.Component<Props> {
-    state: State = {
+    state: ForecastState = {
         code: null,
         message: null,
         forecast: new Array<Array<any>>(5),
         cityInfo: {},
-        forecastIndex: new Array<number>(5)
+        forecastIndex: new Array<number>(5),
+        selectedForecast: [0, 0],
+    }
+
+    componentDidMount() {
+        if (this.props.oldData !== null && this.props.oldData.cityInfo.name === this.props.city) {
+            this.setState(this.props.oldData)
+            this.props.changedCity(this.props.oldData.cityInfo.name)
+        } else if (this.props.city !== "" || (this.props.coord[0] !== "" && this.props.coord[1] !== "")) {
+            this.getForecast()
+        }
+
     }
 
     componentDidUpdate(prevProps: Props) {
-        if (this.props.city !== prevProps.city || this.props.coord !== prevProps.coord) {
+        if ((this.props.city !== prevProps.city && this.props.searchMethod === searchMode.city) || (this.props.coord !== prevProps.coord && this.props.searchMethod === searchMode.coord)) {
             this.getForecast()
         }
-        //console.log(this.state)
+    }
+
+    componentWillUnmount() {
+        this.props.saveData(this.state)
     }
 
     getForecast = () => {
+        this.props.updateLoading(true)
         const url = "https://forecast-io-server.herokuapp.com/forecast" + this.getSearchPath()
         axios.get(url).then(res => {
             const data = res.data
@@ -49,7 +72,7 @@ class Forecast extends React.Component<Props> {
 
             var index: number = -1
             var lastDate: number = 0;
-            for (let weatherData of data.list) {
+            for (let weatherData of data.list) {//collect all data for corresponding days of the week
                 const date = timestampToAdjustedDate(weatherData.dt, cityInfo.timezone).getUTCDate()
                 if (lastDate !== date) {
                     index++;
@@ -61,7 +84,7 @@ class Forecast extends React.Component<Props> {
                 forecast[index].push(weatherData)
             }
 
-            const forecastIndex = forecast.map((day, index) => {
+            const forecastIndex = forecast.map((day, index) => {//find appropriate time to display for default: 11am-2pm are default and varies according to timezone
                 if (index === 0) {
                     return 0;
                 }
@@ -78,10 +101,13 @@ class Forecast extends React.Component<Props> {
                 return 0
             })
 
+            this.props.changedCity(data.city.name)
             this.setState({ code: code, forecast: forecast, cityInfo: cityInfo, forecastIndex: forecastIndex })
+            this.props.updateLoading(false)
         }).catch(err => {
             console.log(err)
             this.setState({ code: err.cod, message: err.message })
+            this.props.updateLoading(false)
         })
     }
 
@@ -94,55 +120,55 @@ class Forecast extends React.Component<Props> {
         }
     }
 
-    getTemperature = (temp: number): string => {
-        switch (Number(this.props.measureSys)) {
-            case (measurementSys.Kelvin):
-                return temp.toFixed(1) + " K"
-            case (measurementSys.Celcius):
-                return (temp - 273.15).toFixed(1) + " °C"
-            case (measurementSys.Fahrenheit):
-                return ((temp - 273.15) * 9 / 5 + 32).toFixed(1) + " °F"
-        }
-        return "This should not happen"
-    }
-
-    cardCycleUp = (index: number): void => {    
+    //index for the following methods refers to the index of the corresponding days
+    cardCycleUp = (index: number): void => {
         const newForecastIndex: Array<number> = [...this.state.forecastIndex]
-        newForecastIndex[index] = newForecastIndex[index]+1;
-        this.setState({forecastIndex: newForecastIndex})
+        newForecastIndex[index] = newForecastIndex[index] + 1;
+        this.setState({ forecastIndex: newForecastIndex })
     }
 
     cardCycleDown = (index: number): void => {
         const newForecastIndex: Array<number> = [...this.state.forecastIndex]
-        newForecastIndex[index] = newForecastIndex[index]-1;
-        this.setState({forecastIndex: newForecastIndex})
+        newForecastIndex[index] = newForecastIndex[index] - 1;
+        this.setState({ forecastIndex: newForecastIndex })
+    }
+
+    changeSelectedForecast = (index: number): void => {
+        this.setState({ selectedForecast: [index, this.state.forecastIndex[index]] })
     }
 
     render() {
         const cards = this.state.forecast.map((day, index) => {
             const forecast = this.state.code === 200 ? this.state.forecast[index][this.state.forecastIndex[index]] : null
-            const temperature = this.getTemperature(forecast.main.temp)
-            const card = this.state.code === 200 ? <WeatherCard dateTimestamp={forecast.dt} weatherInfo={forecast.weather} timezone={this.state.cityInfo.timezone} temp={temperature} /> : null
+            const temperature = getTemperature(forecast.main.temp, this.props.measureSys)
+            const card = this.state.code === 200 ? <WeatherCard dateTimestamp={forecast.dt} weatherInfo={forecast.weather}
+                timezone={this.state.cityInfo.timezone} temp={temperature} clicked={() => this.changeSelectedForecast(index)} /> : null
             return (
-                    <Col key={index}>
-                        <ArrowButton direction={Direction.up} clicked={() => this.cardCycleUp(index)} show={this.state.forecastIndex[index] < this.state.forecast[index].length-1}/>
-                        {card}
-                        <ArrowButton direction={Direction.down} clicked={() => this.cardCycleDown(index)} show={this.state.forecastIndex[index] > 0}/>
-                    </Col>
+                <Col key={index} className="col-6 col-sm-5 col-md-4 col-lg-3 col-xl-2 text-center">
+                    <ArrowButton direction={Direction.up} clicked={() => this.cardCycleUp(index)} show={this.state.forecastIndex[index] < this.state.forecast[index].length - 1} />
+                    {card}
+                    <ArrowButton direction={Direction.down} clicked={() => this.cardCycleDown(index)} show={this.state.forecastIndex[index] > 0} />
+                </Col>
             )
         })
-        // const tempCast = this.state.code === 200 ? this.state.forecast[0][0] : null
-        // const card = this.state.code === 200 ? <WeatherCard dateTimestamp={tempCast.dt} weatherInfo={tempCast.weather} timezone={this.state.cityInfo.timezone} temp={tempCast.main.temp}/> : null
+        const detailedInfo = this.state.code === 200 ? this.state.forecast[this.state.selectedForecast[0]][this.state.selectedForecast[1]] : null
+        const detailedForecast = this.state.code === 200 ? <DetailedForecast forecast={detailedInfo} timezone={this.state.cityInfo.timezone} measureSys={this.props.measureSys} /> : null
         // const tempCast2 = this.state.code === 200 ? this.state.forecast[1][0] : null
         // const card2 = this.state.code === 200 ? <WeatherCard dateTimestamp={tempCast2.dt} weatherInfo={tempCast2.weather} timezone={this.state.cityInfo.timezone} temp={tempCast2.main.temp}/> : null
-        return (
-            <Container>
+        return (this.props.loading ?
+
+            (<Container className="text-center">
+                <Spinner animation="border" role="status">
+                    <span className="sr-only">Loading...</span>
+                </Spinner>
+            </Container>) :
+
+            (<Container>
                 <Row className="justify-content-center">
                     {cards}
-                    {/* {card}
-                    {card2} */}
+                    {detailedForecast}
                 </Row>
-            </Container>
+            </Container>)
         )
     }
 }
