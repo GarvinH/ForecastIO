@@ -6,8 +6,9 @@ import WeatherCard from '../../components/WeatherCard/WeatherCard'
 import { timestampToAdjustedDate } from '../../Resolvers/DateResolver/DateResolver'
 import { measurementSys } from '../../enums'
 import ArrowButton, { Direction } from '../../components/UI/ArrowButton/ArrowButton'
-import DetailedForecast from '../../components/DetailedForecast/DetailedForecast'
+import DetailedForecast from '../../components/DetailedWeather/DetailedWeather'
 import { getTemperature } from '../../Resolvers/UnitResolver/UnitResolver'
+import { getSearchPath, shouldUpdateSearch } from '../../Resolvers/SearchResolver/SearchResolver'
 
 interface Props {
     oldData: ForecastState | null,
@@ -51,7 +52,7 @@ class Forecast extends React.Component<Props> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        if ((this.props.city !== prevProps.city && this.props.searchMethod === searchMode.city) || (this.props.coord !== prevProps.coord && this.props.searchMethod === searchMode.coord)) {
+        if (shouldUpdateSearch(this.props.city, this.props.coord, prevProps.city, prevProps.coord, this.props.searchMethod)) {
             this.getForecast()
         }
     }
@@ -62,7 +63,7 @@ class Forecast extends React.Component<Props> {
 
     getForecast = () => {
         this.props.updateLoading(true)
-        const url = "https://forecast-io-server.herokuapp.com/forecast" + this.getSearchPath()
+        const url = "https://forecast-io-server.herokuapp.com/forecast" + getSearchPath(this.props.searchMethod, this.props.city, this.props.coord)
         axios.get(url).then(res => {
             const data = res.data
 
@@ -111,14 +112,7 @@ class Forecast extends React.Component<Props> {
         })
     }
 
-    getSearchPath = () => {
-        switch (this.props.searchMethod) {
-            case (searchMode.city):
-                return "/city?city=" + this.props.city
-            case (searchMode.coord):
-                return "/coord?lat=" + this.props.coord[0] + "&lon=" + this.props.coord[1]
-        }
-    }
+    
 
     //index for the following methods refers to the index of the corresponding days
     cardCycleUp = (index: number): void => {

@@ -4,6 +4,7 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 import { weatherMode, searchMode, measurementSys } from './enums'
 import WeatherContext from './context/WeatherContext'
 import Forecast, { ForecastState } from './containers/Forecast/Forecast'
+import Current from './containers/Current/Current'
 
 interface State {
   readonly weatherMethod: weatherMode;
@@ -74,7 +75,7 @@ class App extends React.Component {
             <Route path="/forecast" render={() => <Forecast city={this.state.city} coord={this.state.coord}
             searchMethod={this.state.searchMethod} measureSys={this.state.measureSys} changedCity={this.changeCity}
             loading={this.state.loading} updateLoading={this.updateLoading} oldData={this.state.forecastData} saveData={this.saveForecastData}/>} />
-            <Route path="/current" render={() => <h1>current</h1>} />
+            <Route path="/current" render={() => <Current city={this.state.city} coord={this.state.coord} searchMethod={this.state.searchMethod}/>} />
             <Redirect to="/forecast" />
           </Switch>
         </Layout>

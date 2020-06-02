@@ -10,7 +10,7 @@ interface Props {
     measureSys: measurementSys
 }
 
-const DetailedForecast: React.FC<Props> = ({ forecast, timezone, measureSys }: Props) => {
+const DetailedWeather: React.FC<Props> = ({ forecast, timezone, measureSys }: Props) => {
     const feelsLike = forecast.main !== undefined ? (forecast.main.feels_like !== undefined ? <h4>Feels like: <Badge variant="primary">{getTemperature(forecast.main.feels_like, measureSys)}</Badge></h4> : null) : null
     const humidity = forecast.main !== undefined ? (forecast.main.humidity !== undefined ? <h4>Humidity: <Badge variant="secondary">{forecast.main.humidity}%</Badge></h4> : null) : null
     const cloudiness = forecast.clouds !== undefined ? (forecast.clouds.all !== undefined ? <h4>Cloudiness: <Badge variant="secondary">{forecast.clouds.all}%</Badge></h4> : null) : null
@@ -42,4 +42,4 @@ const DetailedForecast: React.FC<Props> = ({ forecast, timezone, measureSys }: P
     )
 }
 
-export default DetailedForecast
+export default DetailedWeather
