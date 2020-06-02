@@ -75,7 +75,6 @@ class App extends React.Component<Props> {
   }
 
   render() {
-    const currentURL = this.props.location.pathname
     return (
       <WeatherContext.Provider value={{
         changeWeatherMode: this.changeWeather,
