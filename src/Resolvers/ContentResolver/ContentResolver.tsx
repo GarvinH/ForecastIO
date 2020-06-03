@@ -10,7 +10,9 @@ export const contentDeterminer = (content: JSX.Element, loading: boolean, code: 
                 </Spinner>
             </Container>)
     } else if (code !== 200 && code !== null) {
-        return (<Alert variant="danger" style={{ textTransform: "capitalize" }}>Error {code}. {message}</Alert>)
+        return (<Container className="text-center">
+            <Alert variant="danger" style={{ textTransform: "capitalize" }}>Error {code}. {message}</Alert>
+        </Container>)
     } else {
         return content
     }
