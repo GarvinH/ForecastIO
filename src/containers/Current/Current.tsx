@@ -41,10 +41,6 @@ class Current extends React.Component<Props> {
         }
     }
 
-    componentWillUnmount() {
-
-    }
-
     getCurrent = () => {
         this.props.updateLoading(true)
         const url = "/current" + getSearchPath(this.props.searchMethod, this.props.city, this.props.coord)
