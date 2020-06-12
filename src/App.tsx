@@ -43,6 +43,15 @@ class App extends React.Component<Props> {
         this.changeWeather(weatherMode.current)
         break;  
     }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const newCoord = []
+        newCoord.push(position.coords.latitude)
+        newCoord.push(position.coords.longitude)
+        this.setState({coord: newCoord, searchMethod: searchMode.coord})
+      })
+    }
   }
 
   changeWeather = (value: weatherMode) => {

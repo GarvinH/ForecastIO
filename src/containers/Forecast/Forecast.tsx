@@ -135,7 +135,7 @@ class Forecast extends React.Component<Props> {
     render() {
         const cards = this.state.forecast.map((day, index) => {
             const forecast = this.state.code === 200 ? this.state.forecast[index][this.state.forecastIndex[index]] : null
-            const temperature = getTemperature(forecast.main.temp, this.props.measureSys)
+            const temperature = this.state.code === 200 ? getTemperature(forecast.main.temp, this.props.measureSys) : ""
             const card = this.state.code === 200 ? <WeatherCard dateTimestamp={forecast.dt} weatherInfo={forecast.weather}
                 timezone={this.state.cityInfo.timezone} temp={temperature} clicked={() => this.changeSelectedForecast(index)} /> : null
             return (
@@ -146,6 +146,7 @@ class Forecast extends React.Component<Props> {
                 </Col>
             )
         })
+
         const detailedInfo = this.state.code === 200 ? this.state.forecast[this.state.selectedForecast[0]][this.state.selectedForecast[1]] : null
         const detailedForecast = this.state.code === 200 ? <DetailedForecast weather={detailedInfo} timezone={this.state.cityInfo.timezone} measureSys={this.props.measureSys} /> : null
 

@@ -55,11 +55,11 @@ class Banner extends React.Component {
     }
 
     searchChanged = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        switch (event.target.value) {
-            case ("city"):
+        switch (Number(event.target.value)) {
+            case (searchMode.city):
                 this.context.changeSearchMode(searchMode.city)
                 break;
-            case ("coord"):
+            case (searchMode.coord):
                 this.context.changeSearchMode(searchMode.coord)
                 break;
         }
@@ -83,9 +83,9 @@ class Banner extends React.Component {
                 <Form onSubmit={this.formSubmit}>
                     <Form.Group>
                         <Form.Label aria-label="Select search method">Search by:</Form.Label>
-                        <Form.Control as="select" onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.searchChanged(event)}>
-                            <option value="city" aria-label="Search by city">City</option>
-                            <option value="coord" aria-label="Search by coordinates">Coordinates</option>
+                        <Form.Control as="select" value={this.context.searchMode} onChange={(event: React.ChangeEvent<HTMLInputElement>) => this.searchChanged(event)}>
+                            <option value={searchMode.city} aria-label="Search by city">City</option>
+                            <option value={searchMode.coord} aria-label="Search by coordinates">Coordinates</option>
                         </Form.Control>
                     </Form.Group>
                     {form}
