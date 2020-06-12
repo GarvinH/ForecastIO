@@ -36,9 +36,9 @@ You will also see any lint errors in the console.
 ## Built With
 
 * [ReactJS](https://reactjs.org/docs/getting-started.html) - The JavaScript library used
-* [React\sBootstrap](https://react-bootstrap.github.io/getting-started/introduction) - The CSS framework used
+* [React Bootstrap](https://react-bootstrap.github.io/getting-started/introduction) - The CSS framework used
 * [Axios](https://github.com/axios/axios) - HTTP client
-* [React\sRouter] - Routing library for React
+* [React Router](https://github.com/ReactTraining/react-router) - Routing library for React
 
 ## Authors
 
