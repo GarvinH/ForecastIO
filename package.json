@@ -1,5 +1,4 @@
 {
-  "homepage": "https://garvinh.github.io/ForecastIO",
   "name": "forecast-io",
   "version": "0.1.0",
   "private": true,
@@ -15,6 +14,7 @@
     "@types/react-redux": "^7.1.9",
     "@types/react-router-dom": "^5.1.5",
     "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
     "gh-pages": "^3.0.0",
     "prettier": "^2.0.5",
     "react": "^16.13.1",

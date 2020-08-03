@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from '../../axios'
+import axios from 'axios'
 import { getSearchPath, shouldUpdateSearch } from '../../Resolvers/SearchResolver/SearchResolver'
 import { searchMode, measurementSys } from '../../enums'
 import DetailedWeather from '../../components/DetailedWeather/DetailedWeather'
@@ -44,7 +44,7 @@ class Current extends React.Component<Props> {
     getCurrent = () => {
         this.props.updateLoading(true)
         const url = "/current" + getSearchPath(this.props.searchMethod, this.props.city, this.props.coord)
-        axios.get(url).then(res => {
+        axios.post(url).then(res => {
             const data = res.data
 
             if (data.cod !== 200) {

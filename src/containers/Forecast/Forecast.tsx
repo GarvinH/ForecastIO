@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from '../../axios'
+import axios from 'axios'
 import { searchMode } from '../../enums'
 import { Container, Row, Col } from 'react-bootstrap'
 import WeatherCard from '../../components/WeatherCard/WeatherCard'
@@ -10,6 +10,7 @@ import DetailedForecast from '../../components/DetailedWeather/DetailedWeather'
 import { getTemperature } from '../../Resolvers/UnitResolver/UnitResolver'
 import { getSearchPath, shouldUpdateSearch } from '../../Resolvers/SearchResolver/SearchResolver'
 import { contentDeterminer } from '../../Resolvers/ContentResolver/ContentResolver'
+import WeatherContext from '../../context/WeatherContext'
 
 interface Props {
     readonly oldData: ForecastState | null,
@@ -42,6 +43,8 @@ class Forecast extends React.Component<Props> {
         selectedForecast: [0, 0],
     }
 
+    static weatherContext = WeatherContext;
+
     componentDidMount() {
         if (this.props.oldData !== null && this.props.oldData.cityInfo.name === this.props.city) {
             this.setState(this.props.oldData)
@@ -64,7 +67,7 @@ class Forecast extends React.Component<Props> {
     getForecast = () => {
         this.props.updateLoading(true)
         const url = "/forecast" + getSearchPath(this.props.searchMethod, this.props.city, this.props.coord)
-        axios.get(url).then(res => {
+        axios.post(url).then(res => {
 
             const data = res.data
 

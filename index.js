@@ -1,25 +1,20 @@
 const express = require("express")
 const axios = require('axios')
-const fs = require('fs')
+require("dotenv").config()
 const app = express()
+const path = require("path")
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    next()
-})
-
-const key = fs.readFileSync(__dirname + "/appid.txt", 'utf8', (err, data) => {
-    if (err) {
-        return console.log("error")
-    }
-    return data
-})
+const publicPath = path.join(__dirname, "build")
 
 const port = process.env.PORT || 3000
 
-app.get("/forecast/city", (req, res) => {
+app.get("/", (req, res) => res.sendFile(path.join(publicPath, "index.html")))
+
+app.use("/", express.static(publicPath))
+
+app.post("/forecast/city", (req, res) => {
     res.header()
-    axios.get("https://api.openweathermap.org/data/2.5/forecast?q=" + req.query.city + "&appid=" + key).then(resp => {
+    axios.get("https://api.openweathermap.org/data/2.5/forecast?q=" + req.query.city + "&appid=" + process.env.APP_ID).then(resp => {
         res.send(resp.data)
     }).catch(err => {
         res.status(err.response.data.cod).send({message: err.response.data.message})
@@ -27,16 +22,16 @@ app.get("/forecast/city", (req, res) => {
 
 })
 
-app.get("/forecast/coord", (req, res) => {
-    axios.get("https://api.openweathermap.org/data/2.5/forecast?lat=" + req.query.lat + "&lon="+req.query.lon+"&appid="+key).then(resp => {
+app.post("/forecast/coord", (req, res) => {
+    axios.get("https://api.openweathermap.org/data/2.5/forecast?lat=" + req.query.lat + "&lon="+req.query.lon+"&appid="+process.env.APP_ID).then(resp => {
         res.send(resp.data)
     }).catch(err => {
         res.status(err.response.data.cod).send({message: err.response.data.message})
     })
 })
 
-app.get("/current/city", (req, res) => {
-    axios.get("https://api.openweathermap.org/data/2.5/weather?q=" + req.query.city + "&appid=" + key).then(resp => {
+app.post("/current/city", (req, res) => {
+    axios.get("https://api.openweathermap.org/data/2.5/weather?q=" + req.query.city + "&appid=" + process.env.APP_ID).then(resp => {
         res.send(resp.data)
     }).catch(err => {
         res.status(err.response.data.cod).send({message: err.response.data.message})
@@ -44,8 +39,8 @@ app.get("/current/city", (req, res) => {
 
 })
 
-app.get("/current/coord", (req, res) => {
-    axios.get("https://api.openweathermap.org/data/2.5/weather?lat=" + req.query.lat + "&lon="+req.query.lon+"&appid="+key).then(resp => {
+app.post("/current/coord", (req, res) => {
+    axios.get("https://api.openweathermap.org/data/2.5/weather?lat=" + req.query.lat + "&lon="+req.query.lon+"&appid="+process.env.APP_ID).then(resp => {
         res.send(resp.data)
     }).catch(err => {
         res.status(err.response.data.cod).send({message: err.response.data.message})
