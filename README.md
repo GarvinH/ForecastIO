@@ -1,6 +1,9 @@
 # Forecast.IO
 A weather web application made using ReactJS.
 
+## Trying it out
+Go visit https://forecast-io.herokuapp.com/#/forecast and try out my app!
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development purposes.
@@ -54,7 +57,7 @@ before attempting to run npm start. The server will not reflect changes on its o
 * [Axios](https://github.com/axios/axios) - HTTP client
 * [React Router](https://github.com/ReactTraining/react-router) - Routing library for React
 * [Heroku](https://www.heroku.com/what) - Hosts the server to this webapp!
-* [OpenWeatherMap/sAPI](https://openweathermap.org/guide) - App obtains weather data from here
+* [OpenWeatherMap API](https://openweathermap.org/guide) - App obtains weather data from here
 
 ## Authors
 
